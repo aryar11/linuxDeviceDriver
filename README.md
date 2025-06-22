@@ -1,8 +1,28 @@
-# Linux Device Driver
+# Linux Kernel Module: Multiplier Driver for Zybo FPGA
 
-This is my repository for creating a driver on my version of Linux on my Zybo FPGA board.
+This project is a simple character device driver developed for a custom hardware multiplier peripheral on a Zybo FPGA board. The goal is to integrate a custom multiplier IP into the Linux kernel running on the Zynq (ARM Cortex-A9) processing system
 
-In this assignment, I used Vivado to build a Zynq(ARM Cortex A9) based microprocessor system suitable for running Linux, and used open source tools to compile the Linux kernel based on the specification of my custom microprocessor system. 
-Once it was compiled and set up, I created the driver ( multiplier.c) that was able to work in the kernel and allows me to work with hardware devices. Devtest.c simply ran the multiplier.c program. 
+## Overview
 
-I enjoyed working in this low-level environment as I learned a lot about what working in the kernel means as it allows more access to the hardware and computer as a whole. 
+Using Vivado, I built a Zynq-based SoC with a custom multiply peripheral and configured it to run a Linux system. I then wrote a Linux kernel module (`Multiplier.c`) that maps to the hardware peripheral using memory-mapped I/O and exposes it via a character device `/dev/multiplier`.
+
+A test program (`DevTest.c`) in user space exercises the driver by writing two integers to the hardware, triggering the multiplication, and reading back the operands and result.
+
+---
+
+## File Descriptions
+
+### `Multiplier.c`
+- A Linux kernel module that:
+  - Maps the physical address of the multiply hardware using `ioremap`.
+  - Implements standard character device operations (`open`, `read`, `write`, `release`).
+  - Accepts two 32-bit integers via `write()`, writes them to the hardware registers.
+  - Reads the two operands and result from the hardware via `read()`.
+
+### `DevTest.c`
+- A user-space program that:
+  - Opens `/dev/multiplier`.
+  - Loops through all integer pairs from 0 to 16.
+  - Writes the operands to the device and reads back the result.
+  - Prints the multiplication result and verifies correctness.
+  - Allows quitting early via user input (`q`).
